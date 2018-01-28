@@ -48,38 +48,45 @@ def get_abilities():
 		abilities.append(value)
 	return abilities
 
-def ability_possibilities():
-	possible_values = all_values()
-	six_times_possible_values = possible_values*6
-	all_ability_possibilities = itertools.combinations(six_times_possible_values, 6)
-	return all_ability_possibilities
+# def ability_possibilities():
+# 	possible_values = all_values()
+# 	six_times_possible_values = possible_values*6
+# 	all_ability_possibilities = itertools.combinations(six_times_possible_values, 6)
+# 	return all_ability_possibilities
 
-def ability_stats():
-	ability_sums = []
-	all_ability_possibilities = ability_possibilities()
-	for ability_set in all_ability_possibilities:
-		ability_sums.append(sum(ability_set))
-	mean = np.mean(ability_sums)
-	sd = np.mean(ability_sums)
-	return {'mean': mean, 'sd': sd}
+# def ability_stats():
+# 	ability_sums = []
+# 	all_ability_possibilities = ability_possibilities()
+# 	for ability_set in all_ability_possibilities:
+# 		ability_sums.append(sum(ability_set))
+# 	mean = np.mean(ability_sums)
+# 	sd = np.mean(ability_sums)
+# 	return {'mean': mean, 'sd': sd}
 
 def analyze_abilities(abilities):
-	stats = ability_stats()
 	ability_total = sum(abilities)
-	possible_roll_count = 1296
 	tot_error = 0
-	z_score = (ability_total - stats['mean'])/stats['sd']
-	percentile = st.norm.cdf(z_score)
-	for ability in abilities:
-		tot_error += ability - 12
+	mean = 73.5 #Calculated in R
+	sd = 6.9 #Calculated in R
+	z_score = (ability_total - mean)/sd
+	percentile = int (st.norm.cdf(z_score) * 100)
+	point_diff = int (ability_total - mean)
+	if (percentile%10 == 1):
+		percentile_suffix = 'st'
+	elif (percentile%10 == 2):
+		percentile_suffix = 'nd'
+	elif (percentile%10 == 3):
+		percentile_suffix = 'rd'
+	else:
+		percentile_suffix = 'th'
 
-	analysis_string = 'These abilities are in the ' + str(percentile * 100) + 'th percentile and are ' + str (tot_error) + ' points above average \n'
+	analysis_string = '\nThese abilities are in the ' + str(percentile) + percentile_suffix + ' percentile and are ' + str (point_diff) + ' points above average'
 	return analysis_string
 
 def give_me_abilities():
 	abilities = get_abilities()
 	analysis = analyze_abilities(abilities)
-	print(analysis_string)
 	print(abilities)
+	print(analysis)
 
 give_me_abilities()
